@@ -1,0 +1,94 @@
+creating root file system
+---------------------------
+mkdir bin etc proc sys sbin lib mnt usr usr/bin usr/sbin
+
+vi etc/inittab
+//copy the below lines in the inittab file-- start of inittab-------------the serial may change according to serial naming convention
+# Startup the system 
+null::sysinit:/etc/init.d/rcS 
+# Start getty on serial for login 
+ttySAC0::respawn:/sbin/getty -L ttySAC0 115200 vt100
+# Stuff to do before rebooting 
+null::shutdown:/bin/umount -a -r 
+// -------end-------------------------------------------------------------
+
+
+vi profile
+//-------------------start of profile file-----------------------
+# Startup the system 
+null::sysinit:/etc/init.d/rcS 
+# Start getty on serial for login 
+ttySAC0::respawn:/sbin/getty -L ttySAC0 115200 vt100
+# Stuff to do before rebooting 
+null::shutdown:/bin/umount -a -r 
+//-------------------end of profile file-----------------------
+
+
+vi passwd
+//-------------------start of profile file-----------------------
+bln::0:0:root:/root:/bin/sh
+//-------------------end of passwd file-----------------------
+
+mkdir /etc/init.d
+vi /etv/init.d/rcS
+//-------------------start of rcS file -----------------------
+#!/bin/sh 
+# --------------------------------------------- 
+# Mounting procfs 
+# --------------------------------------------- 
+mount -n -t proc null /proc 
+# --------------------------------------------- 
+# Mounting sysfs 
+# --------------------------------------------- 
+mount -n -t sysfs null /sys 
+# --------------------------------------------- 
+# Mounting ramfs to /dev 
+# --------------------------------------------- 
+mount -n -t ramfs null /dev 
+# --------------------------------------------- 
+# Create /dev/shm directory and mount tmpfs to /dev/shm
+# --------------------------------------------- 
+mkdir -p /dev/shm 
+/bin/mount -n -t tmpfs tmpfs /dev/shm
+# --------------------------------------------- 
+# Enabling hot-plug 
+# --------------------------------------------- 
+echo "/sbin/mdev" > /proc/sys/kernel/hotplug 
+# --------------------------------------------- 
+# Start mdev 
+# --------------------------------------------- 
+mdev -s 
+# --------------------------------------------- 
+# Set PATH 
+# --------------------------------------------- 
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin 
+# --------------------------------------------- 
+# Set ip address 
+# --------------------------------------------- 
+/sbin/ifconfig lo 127.0.0.1 up 
+/sbin/ifconfig eth0 10.0.0.111 up 
+# --------------------------------------------- 
+sleep 3
+# --------------------------------------------- 
+# Assigning hostname				 
+# --------------------------------------------- 
+/bin/hostname sun7i_cubie2
+# --------------------------------------------- 
+- Give executable permissions to rcS script file.
+
+// ----------- end of rcS file -------------------------------------
+
+chmod a+x etc/init.d/rcS
+
+//-----------------------------------------populating /dev ---------------------------
+mknod console c 5 1
+
+
+//-----------------------------------------populating /lib  from buildroot------------------------------
+# cp -Rfp $(path/to/buildroot)/output/target/lib/* $(path/to/roofs)/lib
+
+//----------------------------------------populating modules from kernel and installing them ----------------
+cd $(PATH/TO/LINUX-SRC)
+make ARCH=arm CROSS_COMPILE=arm-linux- modules
+make ARCH=arm CROSS_COMPILE=arm-linux- INSTALL_MOD_PATH=$(PATH/TO/ROOTFS) modules_install
+
