@@ -1,0 +1,8 @@
+download stable kernel from linux kernel org
+   1. just download the kernel tar ball in site
+   2. just download your kernel from git --- with your liked version FIXME
+ 
+       
+
+download stable uboot from denx uboot
+download busy box
