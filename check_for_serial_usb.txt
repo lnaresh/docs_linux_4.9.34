@@ -1,0 +1,9 @@
+check the usb name while to tell the kernel on which usb u want to communicate from host to target
+
+first take the board
+then check the processor/soc name
+go to linux drivers/tty/serial --
+check in the above the path which driver is ur respective soc based on do some research and some 
+trace in the code required until u find name of the uart driver specified  for that respective soc.
+
+
